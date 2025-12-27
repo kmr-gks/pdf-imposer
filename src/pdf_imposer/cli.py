@@ -78,10 +78,10 @@ def auto(input_pdf, output_pdf, margin):
     This command applies both cropping and booklet formatting in sequence,
     creating an optimized PDF ready for booklet-style printing.
     """
-    try:
-        # Create temporary file for intermediate result
-        temp_path = Path(output_pdf).with_suffix(".tmp.pdf")
+    # Create temporary file for intermediate result
+    temp_path = Path(output_pdf).with_suffix(".tmp.pdf")
 
+    try:
         click.echo(f"Processing {input_pdf}...")
         click.echo("Step 1: Cropping...")
         crop_pdf(input_pdf, str(temp_path), margin=margin)
@@ -95,7 +95,6 @@ def auto(input_pdf, output_pdf, margin):
         click.echo(f"Processed PDF saved to {output_pdf}")
     except Exception as e:
         # Clean up temporary file if it exists
-        temp_path = Path(output_pdf).with_suffix(".tmp.pdf")
         if temp_path.exists():
             temp_path.unlink()
         click.echo(f"Error: {e}", err=True)

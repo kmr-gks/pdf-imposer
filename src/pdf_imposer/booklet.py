@@ -35,8 +35,7 @@ def generate_booklet_order(num_pages: int) -> List[int]:
         num_pages: The total number of pages (must be multiple of 4)
 
     Returns:
-        A list of page indices in the order they should appear in the booklet.
-        Page indices are 0-based. A None value indicates a blank page.
+        A list of page indices (0-based) in the order they should appear in the booklet.
 
     Raises:
         ValueError: If num_pages is not a multiple of 4
