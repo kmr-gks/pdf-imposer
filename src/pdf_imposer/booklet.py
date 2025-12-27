@@ -1,6 +1,6 @@
 """Booklet printing utilities for PDF files."""
 
-from typing import List
+from typing import List, Optional
 
 
 def calculate_booklet_pages(num_pages: int) -> int:
@@ -65,7 +65,7 @@ def generate_booklet_order(num_pages: int) -> List[int]:
     return order
 
 
-def pad_page_order(original_num_pages: int) -> List[int]:
+def pad_page_order(original_num_pages: int) -> List[Optional[int]]:
     """
     Generate page order with padding for booklet printing.
 
