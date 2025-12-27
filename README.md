@@ -4,7 +4,7 @@ A Python tool to optimize PDFs for printing on macOS and Windows. This tool prov
 
 ## Features
 
-- **Crop**: Auto-detect content bounding boxes and remove margins using PyMuPDF
++ **Crop**: Auto-detect content bounding boxes and scale page content to reduce margins using PyMuPDF
 - **Booklet**: Pad pages to a multiple of 4 and reorder for booklet printing using pypdf
 - **Auto**: Run a complete pipeline (crop + booklet) with a single command
 
@@ -28,8 +28,8 @@ pip install -e ".[dev]"
 
 ### Crop command
 
-Remove margins from a PDF by auto-detecting content boundaries:
-
+Reduce visible margins by auto-detecting content boundaries and scaling page content:
+The page size remains unchanged; margins are reduced by scaling content rather than trimming pages.
 ```bash
 pdf-imposer crop input.pdf output-cropped.pdf
 ```
