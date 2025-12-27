@@ -45,7 +45,9 @@ def get_content_bbox(page: fitz.Page) -> Optional[fitz.Rect]:
     return fitz.Rect(x0, y0, x1, y1)
 
 
-def crop_pdf(input_path: str, output_path: str, margin: float = 10, allow_upscale: bool = True) -> None:
+def crop_pdf(
+    input_path: str, output_path: str, margin: float = 10, allow_upscale: bool = True
+) -> None:
     """Reduce apparent margins by scaling the page content to fill the page.
 
     Instead of changing the crop box, this function creates a new PDF where each page's
