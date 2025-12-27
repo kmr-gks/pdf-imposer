@@ -86,10 +86,10 @@ def create_booklet_pdf(input_path: str, output_path: str) -> None:
     # Process 4 items per physical sheet: RF, LF, LB, RB
     if len(page_order) % 4 != 0:
         raise ValueError("Internal error: booklet order length must be multiple of 4")
-
+    
     for i in range(0, len(page_order), 4):
-        rf, lf, lb, rb = page_order[i : i + 4]
-
+        lf, rf, lb, rb = page_order[i : i + 4]
+    
         # FRONT side: (left=lf, right=rf)
         front = PageObject.create_blank_page(width=sheet_w, height=sheet_h)
         _place_page_into_slot(
@@ -109,7 +109,7 @@ def create_booklet_pdf(input_path: str, output_path: str) -> None:
             slot_h=slot_h,
         )
         writer.add_page(front)
-
+    
         # BACK side: (left=lb, right=rb)
         back = PageObject.create_blank_page(width=sheet_w, height=sheet_h)
         _place_page_into_slot(
