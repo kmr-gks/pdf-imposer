@@ -1,9 +1,11 @@
 """PDF cropping utilities using PyMuPDF."""
 
+from typing import Tuple
+
 import fitz  # PyMuPDF
 
 
-def get_content_bbox(page: fitz.Page, margin: float = 0) -> tuple[float, float, float, float]:
+def get_content_bbox(page: fitz.Page, margin: float = 0) -> Tuple[float, float, float, float]:
     """
     Get the bounding box of content on a page.
 
