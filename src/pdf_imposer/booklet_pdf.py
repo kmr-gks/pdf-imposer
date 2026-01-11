@@ -46,7 +46,7 @@ def create_booklet_pdf(input_path: str, output_path: str) -> None:
             return
         # IMPORTANT: no clip -> keep everything (prevents losing numbers near margins)
         sp = src[idx]
-        pix = sp.get_pixmap(dpi=450, alpha=False)
+        pix = sp.get_pixmap(dpi=300, alpha=False)
         target_page.insert_image(rect, pixmap=pix)
 
     if len(order) % 4 != 0:
