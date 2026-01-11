@@ -5,6 +5,7 @@ A Python tool to optimize PDFs for printing on macOS and Windows. This tool prov
 ## Features
 
 + **Crop**: Auto-detect content bounding boxes and scale page content to reduce margins using PyMuPDF
+
 - **Booklet**: Pad pages to a multiple of 4 and reorder for booklet printing using pypdf
 - **Auto**: Run a complete pipeline (crop + booklet) with a single command
 
@@ -30,6 +31,7 @@ pip install -e ".[dev]"
 
 Reduce visible margins by auto-detecting content boundaries and scaling page content:
 The page size remains unchanged; margins are reduced by scaling content rather than trimming pages.
+
 ```bash
 pdf-imposer crop input.pdf output-cropped.pdf
 ```
@@ -49,6 +51,7 @@ pdf-imposer booklet input.pdf output-booklet.pdf
 ```
 
 This command:
+
 - Pads the page count to the nearest multiple of 4 (adds blank pages if needed)
 - Reorders pages so that when printed double-sided and folded, they appear in correct sequence
 
@@ -80,11 +83,13 @@ pdf-imposer auto --help
 ## How Booklet Printing Works
 
 Booklet printing arranges pages so that when you:
+
 1. Print double-sided
 2. Fold the pages in half
 3. Staple along the fold
 
 The pages appear in the correct reading order. For example, a 4-page document becomes:
+
 - Front of sheet: Pages 4 and 1 (side by side)
 - Back of sheet: Pages 2 and 3 (side by side)
 
@@ -92,23 +97,16 @@ When folded, you read: 1, 2, 3, 4.
 
 ## Development
 
-### Running tests
+### Test and Linting 
 
 ```bash
-pytest
-```
-
-### Linting
-
-```bash
-ruff check .
-ruff format .
+pytest && ruff check . && ruff format .
 ```
 
 ### Running from source
 
 ```bash
-python -m pdf_imposer.cli --help
+pip3 install -e . --break-system-packages
 ```
 
 ## Requirements
