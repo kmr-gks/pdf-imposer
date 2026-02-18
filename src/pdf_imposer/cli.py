@@ -17,9 +17,15 @@ def main():
     pass
 
 
+def _default_output_path(input_pdf: str, suffix: str) -> str:
+    p = Path(input_pdf)
+    # input.pdf -> input-<suffix>.pdf
+    return str(p.with_name(f"{p.stem}-{suffix}{p.suffix or '.pdf'}"))
+
+
 @main.command()
 @click.argument("input_pdf", type=click.Path(exists=True, dir_okay=False))
-@click.argument("output_pdf", type=click.Path(dir_okay=False))
+@click.argument("output_pdf", required=False, type=click.Path(dir_okay=False))
 @click.option(
     "--margin",
     default=10,
@@ -33,6 +39,8 @@ def crop(input_pdf, output_pdf, margin):
     This command analyzes each page to find the content boundaries and crops
     the PDF to remove unnecessary white space, while preserving a small margin.
     """
+    if output_pdf is None:
+        output_pdf = _default_output_path(input_pdf, "cropped")
     try:
         click.echo(f"Cropping {input_pdf}...")
         crop_pdf(input_pdf, output_pdf, margin=margin)
@@ -44,7 +52,7 @@ def crop(input_pdf, output_pdf, margin):
 
 @main.command()
 @click.argument("input_pdf", type=click.Path(exists=True, dir_okay=False))
-@click.argument("output_pdf", type=click.Path(dir_okay=False))
+@click.argument("output_pdf", required=False, type=click.Path(dir_okay=False))
 def booklet(input_pdf, output_pdf):
     """
     Reorder pages for booklet printing.
@@ -53,6 +61,8 @@ def booklet(input_pdf, output_pdf):
     so that when printed double-sided and folded in half, the pages appear
     in the correct sequence.
     """
+    if output_pdf is None:
+        output_pdf = _default_output_path(input_pdf, "booklet")
     try:
         click.echo(f"Creating booklet from {input_pdf}...")
         create_booklet_pdf(input_pdf, output_pdf)
@@ -64,7 +74,7 @@ def booklet(input_pdf, output_pdf):
 
 @main.command()
 @click.argument("input_pdf", type=click.Path(exists=True, dir_okay=False))
-@click.argument("output_pdf", type=click.Path(dir_okay=False))
+@click.argument("output_pdf", required=False, type=click.Path(dir_okay=False))
 @click.option(
     "--margin",
     default=10,
@@ -78,6 +88,8 @@ def auto(input_pdf, output_pdf, margin):
     This command applies both cropping and booklet formatting in sequence,
     creating an optimized PDF ready for booklet-style printing.
     """
+    if output_pdf is None:
+        output_pdf = _default_output_path(input_pdf, "auto")
     # Create temporary file for intermediate result
     temp_path = Path(output_pdf).with_suffix(".tmp.pdf")
 
