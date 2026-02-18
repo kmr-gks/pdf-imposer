@@ -42,12 +42,6 @@ def crop(input_pdf, output_pdf, margin, overwrite):
     """
     if output_pdf is None:
         output_pdf = _default_output_path(input_pdf, "cropped")
-
-    out_path = Path(output_pdf)
-    if out_path.exists() and not overwrite:
-        raise click.ClickException(
-            f"Output file already exists: {output_pdf} (use --overwrite to replace)"
-        )
     try:
         click.echo(f"Cropping {input_pdf}...")
         crop_pdf(input_pdf, output_pdf, margin=margin)
@@ -60,8 +54,7 @@ def crop(input_pdf, output_pdf, margin, overwrite):
 @main.command()
 @click.argument("input_pdf", type=click.Path(exists=True, dir_okay=False))
 @click.argument("output_pdf", required=False, type=click.Path(dir_okay=False))
-@click.option("--overwrite", is_flag=True, help="Overwrite output file if it exists.")
-def booklet(input_pdf, output_pdf, overwrite):
+def booklet(input_pdf, output_pdf):
     """
     Reorder pages for booklet printing.
 
@@ -71,11 +64,6 @@ def booklet(input_pdf, output_pdf, overwrite):
     """
     if output_pdf is None:
         output_pdf = _default_output_path(input_pdf, "booklet")
-    out_path = Path(output_pdf)
-    if out_path.exists() and not overwrite:
-        raise click.ClickException(
-            f"Output file already exists: {output_pdf} (use --overwrite to replace)"
-        )
     try:
         click.echo(f"Creating booklet from {input_pdf}...")
         create_booklet_pdf(input_pdf, output_pdf)
@@ -103,16 +91,9 @@ def auto(input_pdf, output_pdf, margin, overwrite):
     creating an optimized PDF ready for booklet-style printing.
     """
     if output_pdf is None:
-        output_pdf = _default_output_path(input_pdf, "final")
-
-    out_path = Path(output_pdf)
-    if out_path.exists() and not overwrite:
-        raise click.ClickException(
-            f"Output file already exists: {output_pdf} (use --overwrite to replace)"
-        )
-
-    # 中間ファイル：outputと衝突しない名前にする
-    temp_path = out_path.with_suffix(".tmp.pdf")
+        output_pdf = _default_output_path(input_pdf, "auto")
+    # Create temporary file for intermediate result
+    temp_path = Path(output_pdf).with_suffix(".tmp.pdf")
 
     try:
         click.echo(f"Processing {input_pdf} -> {output_pdf} ...")
