@@ -20,7 +20,13 @@ def main():
 def _default_output_path(input_pdf: str, suffix: str) -> str:
     p = Path(input_pdf)
     # input.pdf -> input-<suffix>.pdf
-    return str(p.with_name(f"{p.stem}-{suffix}{p.suffix or '.pdf'}"))
+    # if output file already exists, try input-<suffix>-1.pdf, input-<suffix>-2.pdf, etc.
+    output_path = p.with_name(f"{p.stem}-{suffix}{p.suffix or '.pdf'}")
+    exist_file_counter = 1
+    while output_path.exists():
+        output_path = p.with_name(f"{p.stem}-{suffix}-{exist_file_counter}{p.suffix or '.pdf'}")
+        exist_file_counter += 1
+    return str(output_path)
 
 
 @main.command()
