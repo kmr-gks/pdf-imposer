@@ -20,7 +20,13 @@ def main():
 def _default_output_path(input_pdf: str, suffix: str) -> str:
     p = Path(input_pdf)
     # input.pdf -> input-<suffix>.pdf
-    return str(p.with_name(f"{p.stem}-{suffix}{p.suffix or '.pdf'}"))
+    # if output file already exists, try input-<suffix>-1.pdf, input-<suffix>-2.pdf, etc.
+    output_path = p.with_name(f"{p.stem}-{suffix}{p.suffix or '.pdf'}")
+    exist_file_counter = 1
+    while output_path.exists():
+        output_path = p.with_name(f"{p.stem}-{suffix}-{exist_file_counter}{p.suffix or '.pdf'}")
+        exist_file_counter += 1
+    return str(output_path)
 
 
 @main.command()
@@ -32,8 +38,7 @@ def _default_output_path(input_pdf: str, suffix: str) -> str:
     type=float,
     help="Margin to preserve around content in points (default: 10)",
 )
-@click.option("--overwrite", is_flag=True, help="Overwrite output file if it exists.")
-def crop(input_pdf, output_pdf, margin, overwrite):
+def crop(input_pdf, output_pdf, margin):
     """
     Auto-detect content bounding box and remove margins.
 
@@ -42,12 +47,6 @@ def crop(input_pdf, output_pdf, margin, overwrite):
     """
     if output_pdf is None:
         output_pdf = _default_output_path(input_pdf, "cropped")
-
-    out_path = Path(output_pdf)
-    if out_path.exists() and not overwrite:
-        raise click.ClickException(
-            f"Output file already exists: {output_pdf} (use --overwrite to replace)"
-        )
     try:
         click.echo(f"Cropping {input_pdf}...")
         crop_pdf(input_pdf, output_pdf, margin=margin)
@@ -60,8 +59,7 @@ def crop(input_pdf, output_pdf, margin, overwrite):
 @main.command()
 @click.argument("input_pdf", type=click.Path(exists=True, dir_okay=False))
 @click.argument("output_pdf", required=False, type=click.Path(dir_okay=False))
-@click.option("--overwrite", is_flag=True, help="Overwrite output file if it exists.")
-def booklet(input_pdf, output_pdf, overwrite):
+def booklet(input_pdf, output_pdf):
     """
     Reorder pages for booklet printing.
 
@@ -71,11 +69,6 @@ def booklet(input_pdf, output_pdf, overwrite):
     """
     if output_pdf is None:
         output_pdf = _default_output_path(input_pdf, "booklet")
-    out_path = Path(output_pdf)
-    if out_path.exists() and not overwrite:
-        raise click.ClickException(
-            f"Output file already exists: {output_pdf} (use --overwrite to replace)"
-        )
     try:
         click.echo(f"Creating booklet from {input_pdf}...")
         create_booklet_pdf(input_pdf, output_pdf)
@@ -94,8 +87,7 @@ def booklet(input_pdf, output_pdf, overwrite):
     type=float,
     help="Margin to preserve around content in points (default: 10)",
 )
-@click.option("--overwrite", is_flag=True, help="Overwrite output file if it exists.")
-def auto(input_pdf, output_pdf, margin, overwrite):
+def auto(input_pdf, output_pdf, margin):
     """
     Run a basic pipeline: crop then booklet.
 
@@ -103,19 +95,12 @@ def auto(input_pdf, output_pdf, margin, overwrite):
     creating an optimized PDF ready for booklet-style printing.
     """
     if output_pdf is None:
-        output_pdf = _default_output_path(input_pdf, "final")
-
-    out_path = Path(output_pdf)
-    if out_path.exists() and not overwrite:
-        raise click.ClickException(
-            f"Output file already exists: {output_pdf} (use --overwrite to replace)"
-        )
-
-    # 中間ファイル：outputと衝突しない名前にする
-    temp_path = out_path.with_suffix(".tmp.pdf")
+        output_pdf = _default_output_path(input_pdf, "auto")
+    # Create temporary file for intermediate result
+    temp_path = Path(output_pdf).with_suffix(".tmp.pdf")
 
     try:
-        click.echo(f"Processing {input_pdf} -> {output_pdf} ...")
+        click.echo(f"Processing {input_pdf}...")
         click.echo("Step 1: Cropping...")
         crop_pdf(input_pdf, str(temp_path), margin=margin)
 
@@ -123,15 +108,15 @@ def auto(input_pdf, output_pdf, margin, overwrite):
         create_booklet_pdf(str(temp_path), output_pdf)
 
         # Clean up temporary file
-        if temp_path.exists():
-            temp_path.unlink()
+        temp_path.unlink()
 
         click.echo(f"Processed PDF saved to {output_pdf}")
     except Exception as e:
         # Clean up temporary file if it exists
         if temp_path.exists():
             temp_path.unlink()
-        raise click.ClickException(str(e))
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
