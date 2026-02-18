@@ -38,8 +38,7 @@ def _default_output_path(input_pdf: str, suffix: str) -> str:
     type=float,
     help="Margin to preserve around content in points (default: 10)",
 )
-@click.option("--overwrite", is_flag=True, help="Overwrite output file if it exists.")
-def crop(input_pdf, output_pdf, margin, overwrite):
+def crop(input_pdf, output_pdf, margin):
     """
     Auto-detect content bounding box and remove margins.
 
@@ -88,8 +87,7 @@ def booklet(input_pdf, output_pdf):
     type=float,
     help="Margin to preserve around content in points (default: 10)",
 )
-@click.option("--overwrite", is_flag=True, help="Overwrite output file if it exists.")
-def auto(input_pdf, output_pdf, margin, overwrite):
+def auto(input_pdf, output_pdf, margin):
     """
     Run a basic pipeline: crop then booklet.
 
@@ -102,7 +100,7 @@ def auto(input_pdf, output_pdf, margin, overwrite):
     temp_path = Path(output_pdf).with_suffix(".tmp.pdf")
 
     try:
-        click.echo(f"Processing {input_pdf} -> {output_pdf} ...")
+        click.echo(f"Processing {input_pdf}...")
         click.echo("Step 1: Cropping...")
         crop_pdf(input_pdf, str(temp_path), margin=margin)
 
@@ -110,15 +108,15 @@ def auto(input_pdf, output_pdf, margin, overwrite):
         create_booklet_pdf(str(temp_path), output_pdf)
 
         # Clean up temporary file
-        if temp_path.exists():
-            temp_path.unlink()
+        temp_path.unlink()
 
         click.echo(f"Processed PDF saved to {output_pdf}")
     except Exception as e:
         # Clean up temporary file if it exists
         if temp_path.exists():
             temp_path.unlink()
-        raise click.ClickException(str(e))
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
