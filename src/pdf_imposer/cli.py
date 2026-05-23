@@ -6,6 +6,7 @@ from pathlib import Path
 import click
 
 from . import __version__
+from .blank import insert_blank_pages
 from .booklet_pdf import create_booklet_pdf
 from .crop import crop_pdf
 
@@ -80,6 +81,31 @@ def booklet(input_pdf, output_pdf, overwrite):
         click.echo(f"Creating booklet from {input_pdf}...")
         create_booklet_pdf(input_pdf, output_pdf)
         click.echo(f"Booklet PDF saved to {output_pdf}")
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@main.command()
+@click.argument("input_pdf", type=click.Path(exists=True, dir_okay=False))
+@click.argument("output_pdf", required=False, type=click.Path(dir_okay=False))
+def blank(input_pdf, output_pdf):
+    """
+    Insert blank pages before all pages except the first page.
+
+    Example:
+        [1,2,3] -> [1,blank,2,blank,3]
+
+    This is useful for creating note/calculation space on the left page
+    when printing as a booklet.
+    """
+    if output_pdf is None:
+        output_pdf = _default_output_path(input_pdf, "blank")
+
+    try:
+        click.echo(f"Inserting blank pages into {input_pdf}...")
+        insert_blank_pages(input_pdf, output_pdf)
+        click.echo(f"Blank-inserted PDF saved to {output_pdf}")
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
